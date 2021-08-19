@@ -23,7 +23,6 @@ automation-interface-reverse-proxy-container
 %install
 cp -rfa * %{buildroot}
 
-%files
 %include %{_topdir}/SPECS/files.spec
 
 

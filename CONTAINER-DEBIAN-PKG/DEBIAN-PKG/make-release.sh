@@ -67,7 +67,7 @@ function System_checkEnvironment()
 function System_definitions()
 {
     declare -g debPackageRelease
-    declare -g debCurrentGitCommit
+    declare -g currentGitCommit
 
     declare -g projectName
     declare -g workingFolder
@@ -82,7 +82,7 @@ function System_definitions()
         exit 1
     fi
 
-    debCurrentGitCommit=$(git log --pretty=oneline | head -1 | awk '{print $1}')
+    currentGitCommit=$(git log --pretty=oneline | head -1 | awk '{print $1}')
 
     projectName="automation-interface-reverse-proxy_${debPackageRelease}_amd64"
     workingFolder="/tmp"
@@ -115,9 +115,9 @@ function System_systemFilesSetup()
     chmod +x $workingFolderPath/usr/bin/consul.sh
     chmod +x $workingFolderPath/usr/bin/consul-template
     chmod +x $workingFolderPath/usr/bin/consul-template.sh
-	chmod +x $workingFolderPath/usr/bin/syslogng-target.sh
+    chmod +x $workingFolderPath/usr/bin/syslogng-target.sh
 
-	chmod 400 $workingFolderPath/etc/nginx/tls/cert.key
+    chmod 400 $workingFolderPath/etc/nginx/tls/cert.key
 }
 
 
@@ -127,7 +127,7 @@ function System_debianFilesSetup()
     cp -R DEBIAN-PKG/DEBIAN $workingFolderPath
 
     sed -i "s/^Version:.*/Version:\ $debPackageRelease/g" $workingFolderPath/DEBIAN/control
-    sed -i "s/GITCOMMIT/$debCurrentGitCommit/g" $workingFolderPath/DEBIAN/control
+    sed -i "s/GITCOMMIT/$currentGitCommit/g" $workingFolderPath/DEBIAN/control
 
     find $workingFolderPath/DEBIAN -type f -exec chmod 644 {} \;
     chmod +x $workingFolderPath/DEBIAN/postinst

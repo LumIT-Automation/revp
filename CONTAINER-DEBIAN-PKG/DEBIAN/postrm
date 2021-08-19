@@ -1,0 +1,13 @@
+#!/bin/bash
+
+if [ "$1" == "purge" ]; then
+    if podman volume ls | awk '{print $2}' | grep -q ^revp$; then
+        printf "\n* Clean up revp volume...\n"
+        podman volume rm revp
+    fi
+fi
+
+# Force debconf cleanup.
+echo PURGE | debconf-communicate automation-interface-reverse-proxy-container
+
+exit 0

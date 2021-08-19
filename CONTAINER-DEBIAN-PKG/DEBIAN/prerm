@@ -1,0 +1,13 @@
+#!/bin/bash
+
+printf "\n* Container prerm...\n"
+printf "\n* Cleanup...\n"
+if podman ps | awk '{print $2}' | grep -q ^localhost/revp$; then
+    podman stop revp
+fi
+
+if podman images | awk '{print $1}' | grep -q ^localhost/revp$; then
+    podman rmi -f revp
+fi
+
+exit 0

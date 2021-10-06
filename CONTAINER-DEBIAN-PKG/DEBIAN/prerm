@@ -2,12 +2,21 @@
 
 printf "\n* Container prerm...\n"
 printf "\n* Cleanup...\n"
-if podman ps | awk '{print $2}' | grep -q ^localhost/revp$; then
+
+if podman ps | awk '{print $2}' | grep -E '\blocalhost/revp(:|\b)'; then
     podman stop revp
 fi
 
 if podman images | awk '{print $1}' | grep -q ^localhost/revp$; then
-    podman rmi -f revp
+    buildah rmi --force revp
+fi
+
+# Be sure there is not rubbish around.
+if podman ps --all | awk '{print $2}' | grep -E '\blocalhost/revp(:|\b)'; then
+    cIds=$( podman ps --all | awk '$2 ~ /^localhost\/revp/ { print $1 }' )
+    for id in $cIds; do
+        podman rm -f $id
+    done
 fi
 
 exit 0

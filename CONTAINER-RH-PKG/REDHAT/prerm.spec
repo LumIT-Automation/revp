@@ -11,7 +11,7 @@ fi
 if [ "$1" -eq "0" ]; then
     printf "\n* Cleanup...\n" 
 
-    if podman ps | awk '{print $2}' | grep -q ^localhost/revp$; then
+    if podman ps | awk '{print $2}' | grep -E '\blocalhost/revp(:|\b)'; then
         podman stop revp
     fi
     
@@ -20,8 +20,8 @@ if [ "$1" -eq "0" ]; then
     fi
     
     # Be sure there is not rubbish around.
-    if podman ps --all | awk '{print $2}' | grep -q ^localhost/revp$; then
-        cIds=$( podman ps --all | awk '$2 == "localhost/revp" { print $1 }' )
+    if podman ps --all | awk '{print $2}' | grep -E '\blocalhost/revp(:|\b)'; then
+        cIds=$( podman ps --all | awk '$2 ~ /^localhost\/revp/ { print $1 }' )
         for id in $cIds; do
             podman rm -f $id
         done

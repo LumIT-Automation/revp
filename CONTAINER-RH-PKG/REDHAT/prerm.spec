@@ -12,7 +12,7 @@ fi
 if [ "$1" -eq "0" ]; then
     printf "\n* Cleanup...\n"
 
-    if podman ps | awk '{print $2}' | grep -Eq '\blocalhost/revp(:|\b)'; then
+    if podman ps | awk '{print $2}' | grep -Eq '\blocalhost/revp(:|$)'; then
         podman stop -t 5 revp &
         wait $! # Wait for the shutdown process of the container.
     fi
@@ -22,8 +22,8 @@ if [ "$1" -eq "0" ]; then
     fi
 
     # Be sure there is not rubbish around.
-    if podman ps --all | awk '{print $2}' | grep -E '\blocalhost/revp(:|\b)'; then
-        cIds=$( podman ps --all | awk '$2 ~ /^localhost\/revp/ { print $1 }' )
+    if podman ps --all | awk '{print $2}' | grep -E '\blocalhost/revp(:|$)'; then
+        cIds=$( podman ps --all | awk '$2 ~ /^localhost\/revp(:|$)/ { print $1 }' )
         for id in $cIds; do
             podman rm -f $id
         done

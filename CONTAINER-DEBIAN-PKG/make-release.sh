@@ -87,24 +87,31 @@ function System_definitions()
         exit 1
     fi
 
-    serviceProjectName="automation-interface-reverse-proxy_${debPackageRelease}_amd64"
+    shortName="revp"
+    debArch="amd64"
+
+    serviceName="automation-interface-reverse-proxy"
+    containerName="${serviceName}-container"
+    serviceProjectName="${serviceName}_${debPackageRelease}_${debArch}"
     serviceProjectPackage="${workingFolder}/${serviceProjectName}.deb" # inner .deb to be containerized.
 
-    projectName="automation-interface-reverse-proxy-container_${debPackageRelease}_amd64"
+    projectName="${containerName}_${debPackageRelease}_${debArch}"
     workingFolderPath="${workingFolder}/${projectName}"
 }
 
 
-function System_cleanup()
-{
-    if [ -n "$workingFolderPath" ]; then
-        if [ -d "$workingFolderPath" ]; then
-            rm -fR "$workingFolderPath"
-        fi
 
-        mkdir $workingFolderPath
-    fi
+function System_cleanup()
+{   
+    # List of the directories to be deleted.
+    rmDirs="$workingFolderPath ${workingFolder}/${containerName} ${workingFolder}/${serviceProjectName} ${workingFolder}/${projectName}"
+    for dir in $rmDirs; do
+        if [ -d "$dir" ]; then
+            rm -fR "$dir"
+        fi
+    done
 }
+
 
 
 function System_serviceDebCreate()
@@ -116,16 +123,24 @@ function System_serviceDebCreate()
 function System_systemFilesSetup()
 {
     # Setting up system files.
+    mkdir "$workingFolderPath"
+    
+    # Setting up system files.
     cp -R usr $workingFolderPath
     cp -R etc $workingFolderPath
-    mv $serviceProjectPackage $workingFolderPath/usr/lib/revp/
+    cp -R var $workingFolderPath
+    
+    # Cleanup.
+    rm -f $workingFolderPath/var/log/automation/${shortName}/placeholder
 
-    sed -i "s/PACKAGE/${serviceProjectName}.deb/g" $workingFolderPath/usr/lib/revp/Dockerfile
+    mv $serviceProjectPackage $workingFolderPath/usr/lib/${shortName}
+    sed -i "s/PACKAGE/${serviceProjectName}.deb/g" $workingFolderPath/usr/lib/${shortName}/Dockerfile
 
-    find $workingFolderPath -type d -exec chmod 755 {} \;
-    find $workingFolderPath -type f -exec chmod 644 {} \;
-    chmod +x $workingFolderPath/usr/bin/revp-container.sh
-    chmod +x $workingFolderPath/usr/lib/revp/bootstrap.sh
+    find "$workingFolderPath" -type d -exec chmod 0755 {} \;
+    find "$workingFolderPath" -type f -exec chmod 0644 {} \;
+
+    chmod +x $workingFolderPath/usr/bin/${shortName}-container.sh
+    chmod +x $workingFolderPath/usr/lib/${shortName}/bootstrap.sh
 }
 
 
@@ -136,7 +151,6 @@ function System_debianFilesSetup()
 
     sed -i "s/^Version:.*/Version:\ $debPackageRelease/g" $workingFolderPath/DEBIAN/control
 
-    find $workingFolderPath/DEBIAN -type f -exec chmod 644 {} \;
     chmod +x $workingFolderPath/DEBIAN/preinst
     chmod +x $workingFolderPath/DEBIAN/postinst
     chmod +x $workingFolderPath/DEBIAN/prerm

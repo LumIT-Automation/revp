@@ -11,6 +11,9 @@ if [ "$1" == "configure" ]; then
     # Build container image.
     buildah bud -t revp .
 
+    # Grab the host timezone.
+    timeZone=$(timedatectl show| awk -F'=' '/Timezone/ {print $2}')
+
     # First container run: associate name, bind ports, bind fs volume, define init process, ...
     # Until the package is not uninstalled+purged, fs volumes remain untouched -> newly installed package's configuration files are then rewritten with volume's ones (this is why some services are restarted).
     podman run -p 80:80/tcp -p 443:443/tcp --name revp -v revp:/etc/nginx/tls -dt localhost/revp /sbin/init # bind port to HOST.
@@ -19,6 +22,9 @@ if [ "$1" == "configure" ]; then
     systemctl daemon-reload
     systemctl start automation-interface-revp-container # (upon installation, container is already run, so this line is actually redundant).
     systemctl enable automation-interface-revp-container
+
+    printf "\n Set the timezone of the container to be the same as the host timezone...\n"
+    podman exec revp bash -c "timedatectl set-timezone $timeZone"
 
     # syslog-ng seems going into a catatonic state while updating a package: restarting the whole thing.
     if dpkg -l | grep automation-interface-log | grep -q ^ii; then

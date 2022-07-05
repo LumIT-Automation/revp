@@ -18,11 +18,14 @@ if [ "$1" == "configure" ]; then
     # Until the package is not uninstalled+purged, fs volumes remain untouched -> newly installed package's configuration files are then rewritten with volume's ones (this is why some services are restarted).
     podman run -p 80:80/tcp -p 443:443/tcp --name revp -v revp:/etc/nginx/tls -dt localhost/revp /sbin/init # bind port to HOST.
 
-    podman exec sso chown 0:0 /etc/nginx/tls/cert.crt
-    podman exec sso chmod 644 /etc/nginx/tls/cert.crt
-
-    podman exec sso chown 0:0 /etc/nginx/tls/cert.key
-    podman exec sso chmod 400 /etc/nginx/tls/cert.key
+    if [ -f /etc/nginx/tls/cert.crt ]; then
+        podman exec sso chown 0:0 /etc/nginx/tls/cert.crt
+        podman exec sso chmod 644 /etc/nginx/tls/cert.crt
+    fi
+    if [ -f /etc/nginx/tls/cert.key ]; then
+        podman exec sso chown 0:0 /etc/nginx/tls/cert.key
+        podman exec sso chmod 400 /etc/nginx/tls/cert.key
+    fi
 
     printf "\n* Starting Container Service...\n"
     systemctl daemon-reload

@@ -31,6 +31,8 @@ server {
   listen 443 ssl default_server;
   # listen [::]:443 ssl default_server;
 
+  proxy_read_timeout 300;
+
   ssl_certificate /etc/nginx/tls/cert.crt;
   ssl_certificate_key /etc/nginx/tls/cert.key;
 

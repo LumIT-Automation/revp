@@ -1,0 +1,3 @@
+# Days of Retention for api-f5 volumes backup
+REVP_VOL_RETENTION=120
+

@@ -1,7 +1,7 @@
 Package: automation-interface-reverse-proxy
 Version: RELEASE
 Architecture: amd64
-Depends: nginx-full (>= 1.14.2), net-tools (>= 1.60), consul (>= 1.0), syslog-ng (>= 3.19), unattended-upgrades (>=1.11.2)
+Depends: systemd (>= 240), nginx-full (>= 1.14.2), net-tools (>= 1.60), consul (>= 1.0), syslog-ng (>= 3.19), unattended-upgrades (>=1.11.2), iproute2
 Conflicts: exim4-base
 Maintainer: LumIT A-Team, automation@lumit.it
 Homepage: https://www.lumit.it

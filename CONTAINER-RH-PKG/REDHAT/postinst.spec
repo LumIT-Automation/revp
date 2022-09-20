@@ -20,7 +20,7 @@ function containerSetup()
     timeZone=$(timedatectl show| awk -F'=' '/Timezone/ {print $2}')
 
     # First container run: associate name, bind ports, bind fs volume, define init process, ...
-    podman run -p 80:80/tcp -p 443:443/tcp --name revp -v revp:/etc/nginx/tls -dt localhost/revp /sbin/init # bind port to HOST.
+    podman run -p 80:80/tcp -p 443:443/tcp --name revp -v revp:/etc/nginx/tls -dt localhost/revp /lib/systemd/systemd # bind port to HOST.
 
     printf "$wallBanner Starting Container Service..." | wall -n
     systemctl daemon-reload

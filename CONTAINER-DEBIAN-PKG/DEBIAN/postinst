@@ -16,7 +16,7 @@ if [ "$1" == "configure" ]; then
 
     # First container run: associate name, bind ports, bind fs volume, define init process, ...
     # Until the package is not uninstalled+purged, fs volumes remain untouched -> newly installed package's configuration files are then rewritten with volume's ones (this is why some services are restarted).
-    podman run -p 80:80/tcp -p 443:443/tcp --name revp -v revp:/etc/nginx/tls -dt localhost/revp /sbin/init # bind port to HOST.
+    podman run -p 80:80/tcp -p 443:443/tcp --name revp -v revp:/etc/nginx/tls -dt localhost/revp /lib/systemd/systemd # bind port to HOST.
 
     podman exec sso [ -f /etc/nginx/tls/cert.crt ] && chown 0:0 /etc/nginx/tls/cert.crt
     podman exec sso [ -f /etc/nginx/tls/cert.crt ] && chmod 644 /etc/nginx/tls/cert.crt
